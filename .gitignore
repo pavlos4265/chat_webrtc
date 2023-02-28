@@ -1,0 +1,8 @@
+chat/cert/
+chat/dist/
+chat/node_modules/
+chat/.parcel-cache/
+chat/package-lock.json
+chat_tracker/cert/
+chat_tracker/node_modules/
+chat_tracker/package-lock.json

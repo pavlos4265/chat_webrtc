@@ -26,19 +26,19 @@ const UserRequests = (props) => {
     }
 
     return (
-        <>
-        <p>Users that have requested to establish a connection with you:</p>
-        {props.userRequests.map(
-            (userRequest, id) =>
-                <div key="id" className="userRequest">
-                    <span>publicKey</span><br/>
-                    {userRequest.publicKey}<br/><br/>
-                    <span>tracker</span><br/>
-                    {userRequest.tracker}<br/><br/>
-                    <button onClick={(e)=>onAcceptClick(userRequest)}>accept</button>
-                </div>
-        )}
-        </>
+        <div id="user_requests">
+            <p>Users that have requested to establish a connection with you:</p>
+            {props.userRequests.map(
+                (userRequest, id) =>
+                    <div key={id} className="user_request">
+                        <span>publicKey</span><br/>
+                        {userRequest.publicKey}<br/><br/>
+                        <span>tracker</span><br/>
+                        {userRequest.tracker}<br/><br/>
+                        <button onClick={(e)=>onAcceptClick(userRequest)}>accept</button>
+                    </div>
+            )}
+        </div>
     );
 
 }

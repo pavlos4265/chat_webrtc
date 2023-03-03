@@ -77,25 +77,22 @@ const Chat = (props) => {
             <div id="chat_info">
                 {props.currentChat.nickname}
             </div>
-            
-                <div id="chat_messages" ref={messagesDiv}>
-                    {props.currentMessages.map(
-                        (message, idx) => 
-                            <div style={getMessageStyle(message.sender)} className="message" key={idx}>
-                                <span className="message_user">
-                                {message.sender == 0 && <>You</>}
-                                {message.sender == 1 && <>{props.currentChat.nickname}</>}
-                                </span> <span className="message_timestamp">{date(message.timestamp)}</span><br/>
-                                {message.message}<br/>
-                                
-                            </div>
-                    )
-                    }
-                </div>
-                <div id="chat_textarea">
-                    <textarea onKeyDown={onEnter} ref={textElement}></textarea>
-                </div>
-            
+            <div id="chat_messages" ref={messagesDiv}>
+                {props.currentMessages.map(
+                    (message, idx) => 
+                        <div style={getMessageStyle(message.sender)} className="message" key={idx}>
+                            <span className="message_user">
+                            {message.sender == 0 && <>You</>}
+                            {message.sender == 1 && <>{props.currentChat.nickname}</>}
+                            </span> <span className="message_timestamp">{date(message.timestamp)}</span><br/>
+                            {message.message}<br/>           
+                        </div>
+                )
+                }
+            </div>
+            <div id="chat_textarea">
+                <textarea onKeyDown={onEnter} ref={textElement}></textarea>
+            </div>  
         </div>
     );
 }

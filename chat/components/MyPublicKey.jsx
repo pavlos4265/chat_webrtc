@@ -29,7 +29,7 @@ const MyPublicKey = () => {
     return (
         <>
         <h2>Public key:</h2>
-        <textarea style={{width: "100%", height: "20%"}} value={publicKey} readOnly></textarea>
+        <textarea style={{boxSizing: "border-box", width: "100%", height: "20%"}} value={publicKey} readOnly></textarea>
         </>
     );
 }

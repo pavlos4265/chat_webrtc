@@ -47,7 +47,7 @@ const Chat = (props) => {
             props.sendOffer(props.currentChat.publicKey, props.currentChat.tracker);
             return;
         }else{
-            props.initConnectionWS(props.currentChat.tracker).then(
+            props.initConnectionWS(props.currentChat.tracker,
                 () => {
                     props.setChatStatus("Attempting to connect to "+props.currentChat.nickname);
                     props.sendOffer(props.currentChat.publicKey, props.currentChat.tracker);

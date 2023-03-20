@@ -89,34 +89,83 @@ const getFunctions = (keyPair, setUserRequests, setConversations, setChatStatus,
     const subtleCrypto = window.crypto.subtle;
     const localStorage = window.localStorage;
 
-    const initConnectionWS = async (tracker) => {
+    const initConnectionWS = async (tracker, onInit=null) => {
         setChatStatus("Attemping to connect to "+tracker);
 
-        await connectToWS(tracker, onTrackerMessage(tracker));
+        connectToWS(tracker,
+            () => setChatStatus("Connected to "+tracker),
+            onTrackerMessage(tracker, onInit));
+    }
 
-        setChatStatus("Connected to "+tracker);
-
+    const sendSignedPublicKey = async (tracker, serverKey) => {
         const exportedKeyPair = JSON.parse(localStorage.getItem("keyPair"));
         const base64key = btoa(JSON.stringify(exportedKeyPair[0]));
         const message = {
             type: "publicKey",
-            content: base64key
+            content: base64key,
+            timestamp: Date.now()
         };
-    
-        sendData(mainsocketaddr, JSON.stringify(message));
+        
+        const exportedServerKey = JSON.parse(atob(serverKey));
+        const keyObj = await subtleCrypto.importKey("jwk", exportedServerKey, 
+            {
+                name: "ECDH",
+                namedCurve: "P-384"
+            },
+            true,
+            []
+        );
+        
+        const signKey = await subtleCrypto.deriveKey(
+            {
+                name: "ECDH",
+                public: keyObj
+            },
+            keyPair[1],
+            {
+                name: "HMAC",
+                hash: "SHA-256",
+                length: 256
+            },
+            false,
+            ["sign"]
+        );
+
+        const signature = await subtleCrypto.sign(
+            {name: "HMAC"},
+            signKey,
+            new TextEncoder().encode(JSON.stringify(message))
+        );
+
+        message.signature = [... new Uint8Array(signature)];
+
+        sendData(tracker, JSON.stringify(message));;
     }
 
-    const onTrackerMessage = (tracker) => {
+    const onTrackerMessage = (tracker, onInit) => {
         return (data) => {      
-    
             let dataObj;
             try {
                 dataObj = JSON.parse(data);
             }catch (e) {
                 return;
             }
-    
-            if (dataObj.type == null || dataObj.from == null || dataObj.iv == null || !Object.hasOwn(dataObj, "content"))
+
+            if (dataObj.type == null)
+                return;
+                
+            if (dataObj.type === "publicKey") {
+                sendSignedPublicKey(tracker, dataObj.content).then(
+                    ()=>{
+                        if (onInit != null)
+                            onInit();
+                    }
+                );
+                
+                return;
+            }
+
+            if (dataObj.from == null || dataObj.iv == null || !Object.hasOwn(dataObj, "content"))
                 return;
     
             if (!isWhitelisted(dataObj.from)) {

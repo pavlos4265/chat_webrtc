@@ -23,33 +23,26 @@ const isConnected = (ip) => {
     return false;
 }
 
-const connectToWS = async (ip, onMessage = null) => {
+const connectToWS = async (ip, onOpen, onMessage = null) => {
     if (isConnected(ip))
         return;
 
     const socket = new WebSocket("wss://"+ip);
     
-    await new Promise((resolve, reject) => {
-        socket.onopen = () => {
-            webSockets.set(ip, socket);
+    socket.onopen = () => {
+        webSockets.set(ip, socket);
+        onOpen();
+    };
     
-            resolve();
-        };
-
-        socket.onerror = () => {
-            reject();
-        }
-    });
+    socket.onmessage = (event) => {
+        if (onMessage != null)
+            onMessage(event.data);
+    }
 
     socket.onclose = () => {
         if (webSockets.get(ip) != null)
             webSockets.delete(ip);
     };
-
-    socket.onmessage = (event) => {
-        if (onMessage != null)
-            onMessage(event.data);
-    }
 }
 
 const disconnectFromWS = (ip) => {

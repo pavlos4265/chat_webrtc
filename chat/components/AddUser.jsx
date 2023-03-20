@@ -40,7 +40,7 @@ const AddUser = (props) => {
             return;
         }
     
-       props.initConnectionWS(tracker).then(
+       props.initConnectionWS(tracker,
             () => {
                 props.sendOffer(key, tracker);
                 setMessage("Request sent.");
